@@ -17,7 +17,7 @@ const navItems = [
   },
 ];
 
-export default function Navbar() {
+const Navbar = () => {
   const pathName = usePathname();
   const { user } = useUser();
   return (
@@ -64,4 +64,6 @@ export default function Navbar() {
       </div>
     </header>
   );
-}
+};
+
+export default Navbar;
