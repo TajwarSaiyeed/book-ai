@@ -24,8 +24,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { checkBookExists, createBook, saveBookSegments } from "@/lib/actions/book.actions";
 import { useRouter } from "next/navigation";
-import { parsePDFFile } from "@/lib/utils";
-import { upload } from "@vercel/blob/client";
+import { parsePDFFile, uploadFileToBlob } from "@/lib/utils";
 
 export default function UploadForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,36 +71,34 @@ export default function UploadForm() {
 
       const parsedPDF = await parsePDFFile(pdfFile);
 
+      console.log("Parse : ", parsedPDF);
+
       if (parsedPDF.content.length === 0) {
         toast.error("Failed to parse PDF. Please try again with a different file.");
         return;
       }
 
-      const uploadedPdfBlob = await upload(fileTitle, pdfFile, {
-        access: "public",
-        handleUploadUrl: "/api/upload",
-        contentType: "application/pdf",
-      });
+      const uploadedPdfBlob = await uploadFileToBlob(fileTitle, pdfFile, "application/pdf");
 
       let coverUrl: string;
 
       if (data.coverImage) {
         const coverFile = data.coverImage;
-        const uploadedCoverBlob = await upload(`${fileTitle}_cover.png`, coverFile, {
-          access: "public",
-          handleUploadUrl: "/api/upload",
-          contentType: coverFile.type,
-        });
+        const uploadedCoverBlob = await uploadFileToBlob(
+          `${fileTitle}_cover.png`,
+          coverFile,
+          coverFile.type
+        );
         coverUrl = uploadedCoverBlob.url;
       } else {
         const response = await fetch(parsedPDF.cover);
         const blob = await response.blob();
 
-        const uploadedCoverBlob = await upload(`${fileTitle}_cover.png`, blob, {
-          access: "public",
-          handleUploadUrl: "/api/upload",
-          contentType: "image/png",
-        });
+        const uploadedCoverBlob = await uploadFileToBlob(
+          `${fileTitle}_cover.png`,
+          blob as File,
+          "image/png"
+        );
         coverUrl = uploadedCoverBlob.url;
       }
 

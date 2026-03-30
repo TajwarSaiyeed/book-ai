@@ -21,7 +21,7 @@ const Navbar = () => {
   const pathName = usePathname();
   const { user } = useUser();
   return (
-    <header className="w-full fixed z-50 bg-('bg-primary')">
+    <header className="w-full fixed z-50 bg-(--bg-primary)">
       <div className="wrapper navbar-height py-4 flex justify-between items-center">
         <Link className="flex gap-0.5 items-center" href="/">
           <Image src={Logo} alt="Book AI Logo" width={42} height={24} className="rounded-sm" />

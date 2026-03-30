@@ -109,3 +109,30 @@ export function generateSlug(text: string): string {
 export const escapeRegex = (str: string): string => {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
+
+// Upload file to Vercel Blob via server route
+export async function uploadFileToBlob(filename: string, file: File, contentType: string) {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("filename", filename);
+    formData.append("contentType", contentType);
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Upload failed");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw new Error(
+      `Failed to upload file: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
